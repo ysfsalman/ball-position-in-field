@@ -1,43 +1,25 @@
 import numpy as np
 import cv2
 
-def region_of_interest(img, vertices):
-    # Define a blank matrix that matches the image height/width.
-    mask = np.zeros_like(img)
-    # Retrieve the number of color channels of the image.
-    channel_count = img.shape[2]
-    # Create a match color with the same color channel counts.
-    match_mask_color = (255,) * channel_count
-      
-    # Fill inside the polygon
-    cv2.fillPoly(mask, vertices, match_mask_color)
-    
-    # Returning the image only where mask pixels match
-    masked_image = cv2.bitwise_and(img, mask)
-    return masked_image
+
+def test(image, crop):
+    imgSize=maskSize= np.array(image.shape)
+    maskSize[0:2] *= 2
+    #crop[:,0] += image.shape[1]
+    #crop[:,1] += image.shape[0]
+    font = cv2.FONT_HERSHEY_SIMPLEX   
+    # fontScale 
+    fontScale = 1   
+    # Blue color in BGR 
+    color = (255, 0, 0) 
+    newmask = np.zeros(maskSize)
+    match_mask_color = (255,) * image.shape[2]
+    cv2.fillPoly(newmask, np.int32([crop]), match_mask_color)
+    for i in range(len(crop)):	
+        cv2.putText(newmask, '{}'.format(i), tuple(crop[i]), font,  
+                   fontScale, color, 5, cv2.LINE_AA) 
+    cv2.imshow("mask", newmask)
+    print(np.int32(crop))
 
 
 
-width = 1000
-height = 200	
-region_of_interest_vertices = [
-    (0, height),
-    (width / 2, height / 2),
-    (width, height),
-]
-
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-region_of_interest_vertices = [
-    (0, height),
-    (width / 2, height / 2),
-    (width, height),
-]
-image = cv2.imread('field.jpg')
-cropped_image = region_of_interest(
-    image,
-    np.array([region_of_interest_vertices], np.int32),
-)
-plt.figure()
-plt.imshow(cropped_image)
-plt.show()

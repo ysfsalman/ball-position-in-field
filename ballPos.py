@@ -18,7 +18,7 @@ import numpy as np
 import validators as vd
 from transformfield import get_transform, get_ROI
 from detectball import get_filter_param 
-from detectball import ball as bp
+from detectball import ballPos as bp
 import threading
 import time
 from multiprocessing import Process
@@ -30,19 +30,20 @@ class ball():
           # general variable
           self.fieldSize = fieldSize
           self.offset = 100
-          self.stream = stream
+          self.wantStream = stream
           self.pos = np.zeros(2)
-
+          self.posinImg = np.zeros(2)
           # initialize video stream.  
           # define webcamera, something to change
-          #if vd.url(cam):
-           #    self.cap = cv2.VideoCapture(cam)
-          #else:
-          self.cap = cv2.VideoCapture(0) 
+          if vd.url(cam):
+               self.cap = cv2.VideoCapture(cam)
+          else:
+               self.cap = cv2.VideoCapture(0) 
           
           # get image input/ first frame
           time.sleep(1)           
-          _, img_init = self.cap.read()
+          _, self.frame = self.cap.read()
+          img_init = self.frame
           # get transformation
           self.trans, self.invTrans = get_transform(img_init,
                                    self.fieldSize, self.offset)
@@ -52,21 +53,22 @@ class ball():
           self.colorParam = get_filter_param(img_init)
           cv2.destroyAllWindows()
           # start process
-          #thread = threading.Thread(target=self.runBallPos, args=())
-          #thread.start()
+          self.thread = threading.Thread(target=self.runBallPos, args=())
+          self.thread.start()
           
           # alternative
-          p = Process(target=self.runBallPos, args=())
-          p.start()
-          p.join()
+          #p = Process(target=self.runBallPos, args=())
+          #p.start()
+          #p.join()
           time.sleep(1)           
 
      def locateBall(self, image):
           # cut image
-          image = cv2.bitwise_and(image, self.mask)
+          image = cv2.bitwise_and(image, image, self.mask)
           # detect ball using color mask 
           # get ball position in image coordinate
           ball = bp(image, self.colorParam)
+          self.posinImg = ball
           ball = np.append(ball,1)
           # transform to field orientation
           ball = self.trans.dot(ball)
@@ -77,26 +79,33 @@ class ball():
           # running in background(threading), 
           # possible to use multiprocessing
           while True:
-               _, image = self.cap.read()
+               _, self.frame = self.cap.read()
+               image = self.frame
                self.locateBall(image)
-               if True:
-                    cv2.putText(image, 'a', , cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0) , 5, cv2.LINE_AA) 
-                    cv2.imshow("frame",image)
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                         break         
-                    print('oio')
-               print('io')
-          # When everything done, release the capture
-          cap.release()
-          cv2.destroyAllWindows()
-     
+               if self.wantStream =='on':
+                    self.show(image)
+               
      def getBallPos(self):
           return self.pos
           
+     def show(self, image):
+          position = self.pos
+          center = tuple(self.posinImg.astype(int))
+          cv2.putText(image, str(position), center, 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, 
+                    (255, 0, 0) , 5, cv2.LINE_AA)  
+          cv2.imshow("frame", image)
+          if cv2.waitKey(1) & 0xFF == ord('q'):
+               cap.release()
+               cv2.destroyAllWindows()
+     
 
 if __name__=='__main__':
     url = 'http://192.168.1.16:4747/video'
-    a = ball(cam=0,stream='on')
+    a = ball(cam=url,stream ='on')
     while True:
-         print(a.getBallPos())
-         time.sleep(0.2)
+         print(f'Ball Position: {a.getBallPos()}')
+         time.sleep(0.5)
+
+
+         

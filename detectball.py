@@ -37,7 +37,7 @@ def get_filter_param(image):
     return colorLower, colorUpper        
 
 #source: pyimagesearch.com
-def ball(image, colorParam):
+def ballPos(image, colorParam):
     # detect ball using color mask
     colorLower, colorUpper = colorParam
     # resize the image, blur it, 
@@ -96,7 +96,7 @@ if __name__=='__main__':
     mask = get_ROI(img_init, invTrans)
     img_init = cv2.bitwise_and(img_init, mask)
     colorParam = get_filter_param(img_init)
-    pos = ball(img_init, colorParam)
+    pos = ballPos(img_init, colorParam)
     pos = np.append(pos,1)    
     pos = trans.dot(pos)
     pos = pos/pos[-1]

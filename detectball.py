@@ -10,22 +10,22 @@ def nothing(x):
 
 def get_filter_param(image): 
     # return HSV value for ball detection using color filtering    
-    cv2.namedWindow("Trackbars")
-    cv2.createTrackbar("L - H", "Trackbars", 0, 255, nothing)
-    cv2.createTrackbar("L - S", "Trackbars", 0, 255, nothing)
-    cv2.createTrackbar("L - V", "Trackbars", 0, 255, nothing)
-    cv2.createTrackbar("U - H", "Trackbars", 255, 255, nothing)
-    cv2.createTrackbar("U - S", "Trackbars", 255, 255, nothing)
-    cv2.createTrackbar("U - V", "Trackbars", 255, 255, nothing)    
+    cv2.namedWindow("filtering..")
+    cv2.createTrackbar("L - H", "filtering..", 0, 255, nothing)
+    cv2.createTrackbar("L - S", "filtering..", 0, 255, nothing)
+    cv2.createTrackbar("L - V", "filtering..", 0, 255, nothing)
+    cv2.createTrackbar("U - H", "filtering..", 255, 255, nothing)
+    cv2.createTrackbar("U - S", "filtering..", 255, 255, nothing)
+    cv2.createTrackbar("U - V", "filtering..", 255, 255, nothing)    
     
     while True:
         hsv =  cv2.cvtColor(image, cv2.COLOR_BGR2HSV)        
-        l_h = cv2.getTrackbarPos("L - H", "Trackbars")
-        l_s = cv2.getTrackbarPos("L - S", "Trackbars")
-        l_v = cv2.getTrackbarPos("L - V", "Trackbars")
-        u_h = cv2.getTrackbarPos("U - H", "Trackbars")
-        u_s = cv2.getTrackbarPos("U - S", "Trackbars")
-        u_v = cv2.getTrackbarPos("U - V", "Trackbars")
+        l_h = cv2.getTrackbarPos("L - H", "filtering..")
+        l_s = cv2.getTrackbarPos("L - S", "filtering..")
+        l_v = cv2.getTrackbarPos("L - V", "filtering..")
+        u_h = cv2.getTrackbarPos("U - H", "filtering..")
+        u_s = cv2.getTrackbarPos("U - S", "filtering..")
+        u_v = cv2.getTrackbarPos("U - V", "filtering..")
         colorLower = np.array([l_h, l_s, l_v])
         colorUpper = np.array([u_h, u_s, u_v])
         mask = cv2.inRange(hsv, colorLower, colorUpper)
@@ -83,9 +83,7 @@ def ballPos(image, colorParam):
     cv2.destroyAllWindows()
     '''
     center = np.array(center)
-    print(center)
     center[1] = center[1]+radius
-    print(center)
     return center
 
 

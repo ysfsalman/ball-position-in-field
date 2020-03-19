@@ -15,7 +15,6 @@ date        : March 2020
 
 import cv2
 import numpy as np
-import validators as vd
 from transformfield import get_transform, get_ROI
 from detectball import get_filter_param 
 from detectball import ballPos as bp
@@ -75,6 +74,7 @@ class ball():
           ball = self.trans.dot(ball)
           ball = ball/ball[-1]          
           self.pos = np.delete(ball,2) # in cm
+          self.pos = np.around(self.pos,0) # set decimal point
      
      # bug 1: camera failed to read which break the loop 
      # https://www.pyimagesearch.com/2016/12/26/opencv-resolving-nonetype-errors/
@@ -90,7 +90,7 @@ class ball():
                     self.cap = cv2.VideoCapture(self.cam)
                     time.sleep(0.01)
                     continue
-               # bug 2: no contour detected which breaks the loop
+               # bug 2: fail if center return not array
                self.locateBall(image)
                if self.wantStream =='on':
                     self.show(image)
@@ -103,7 +103,7 @@ class ball():
           center = tuple(self.posinImg.astype(int))
           cv2.putText(image, str(position), center, 
                     cv2.FONT_HERSHEY_SIMPLEX, 1, 
-                    (255, 0, 0) , 5, cv2.LINE_AA)  
+                    (255, 0, 0) , 3, cv2.LINE_AA)  
           cv2.imshow("frame", image)
           if cv2.waitKey(1) & 0xFF == ord('q'):
                cap.release()
@@ -113,7 +113,7 @@ class ball():
 if __name__=='__main__':
     # use droidcam to use phone as input 
     url = 'http://192.168.1.16:4747/video'
-    a = ball(cam=0,stream ='on')
+    a = ball(cam=url,stream ='on')
     while True:
          print(f'Ball Position: {a.getBallPos()}')
          time.sleep(0.5)

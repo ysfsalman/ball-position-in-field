@@ -35,7 +35,8 @@ class ball():
           self.posinImg = np.zeros(2)
           # initialize video stream.  
           # define webcamera, something to change
-          if vd.url(cam):
+          self.cam = cam
+          if type(stream) == str:
                self.cap = cv2.VideoCapture(cam)
           else:
                self.cap = cv2.VideoCapture(0) 
@@ -64,7 +65,7 @@ class ball():
 
      def locateBall(self, image):
           # cut image
-          image = cv2.bitwise_and(image, image, self.mask)
+          image = cv2.bitwise_and(image, self.mask)
           # detect ball using color mask 
           # get ball position in image coordinate
           ball = bp(image, self.colorParam)
@@ -74,13 +75,22 @@ class ball():
           ball = self.trans.dot(ball)
           ball = ball/ball[-1]          
           self.pos = np.delete(ball,2) # in cm
-
+     
+     # bug 1: camera failed to read which break the loop 
+     # https://www.pyimagesearch.com/2016/12/26/opencv-resolving-nonetype-errors/
      def runBallPos(self):
           # running in background(threading), 
           # possible to use multiprocessing
           while True:
                _, self.frame = self.cap.read()
                image = self.frame
+               if image is None:
+                    # handle bug 1        
+                    self.cap.release()
+                    self.cap = cv2.VideoCapture(self.cam)
+                    time.sleep(0.01)
+                    continue
+               # bug 2: no contour detected which breaks the loop
                self.locateBall(image)
                if self.wantStream =='on':
                     self.show(image)
@@ -98,11 +108,12 @@ class ball():
           if cv2.waitKey(1) & 0xFF == ord('q'):
                cap.release()
                cv2.destroyAllWindows()
-     
+      
 
 if __name__=='__main__':
+    # use droidcam to use phone as input 
     url = 'http://192.168.1.16:4747/video'
-    a = ball(cam=url,stream ='on')
+    a = ball(cam=0,stream ='on')
     while True:
          print(f'Ball Position: {a.getBallPos()}')
          time.sleep(0.5)

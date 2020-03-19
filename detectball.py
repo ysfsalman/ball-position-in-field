@@ -56,7 +56,7 @@ def ballPos(image, colorParam):
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    center = None
+    center = (0,0)
     # only proceed if at least one contour was found
     if len(cnts) > 0:
         # find the largest contour in the mask, then use
@@ -67,7 +67,7 @@ def ballPos(image, colorParam):
         M = cv2.moments(c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         # only proceed if the radius meets a minimum size
-        '''
+        '''' # only to test detectball.py
         if radius > 10:
             # draw the circle and centroid on the image,
             # then update the list of tracked points
@@ -76,14 +76,14 @@ def ballPos(image, colorParam):
             cv2.circle(image, center, 5, (0, 0, 255), -1)
             cv2.putText(image, '({})'.format(center), center,  
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0) , 5, cv2.LINE_AA) 
-    
+        center = np.array(center)
+        center[1] = center[1]+radius
     # show the frame to our screen
     cv2.imshow("Ball position", image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     '''
     center = np.array(center)
-    center[1] = center[1]+radius
     return center
 
 

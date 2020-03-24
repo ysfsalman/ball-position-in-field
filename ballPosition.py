@@ -15,16 +15,16 @@ date        : March 2020
 
 import cv2
 import numpy as np
-from transformfield import get_transform, get_ROI
-from detectball import get_filter_param 
-from detectball import ballPos as bp
+from .transformfield import get_transform, get_ROI
+from .detectball import get_filter_param 
+from .detectball import ballPos as bp
 import threading
 import time
 from multiprocessing import Process
 
 
 class ball():
-     # Object to acquire ball position
+     # Ball object to acquire its position
      def __init__(self, cam = 0, stream = 'off', fieldSize = (1200,800) ):
           # general variable
           self.fieldSize = fieldSize

@@ -1,7 +1,6 @@
 import cv2 
 import numpy as np
-from transformfield import get_transform, get_ROI
-from test import test
+from .transformfield import get_transform, get_ROI
 import imutils
 
 # source pysource.com
